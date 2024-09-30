@@ -1,21 +1,29 @@
 package com.example.msauth.service.impl;
 
-
 import com.example.msauth.dto.AuthUserDto;
 import com.example.msauth.entity.AuthUser;
 import com.example.msauth.entity.TokenDto;
-import com.example.msauth.repository.AuthRepository;
+
+
+import com.example.msauth.repository.AuthUserRepository;
 import com.example.msauth.security.JwtProvider;
 import com.example.msauth.service.AuthUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+
+
+
 import java.util.Optional;
+
+
+
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
     @Autowired
-    AuthRepository authRepository;
+    AuthUserRepository authUserRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -24,7 +32,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Override
     public AuthUser save(AuthUserDto authUserDto) {
-        Optional<AuthUser> user = authRepository.findByUserName(authUserDto.getUserName());
+        Optional<AuthUser> user = authUserRepository.findByUsername(authUserDto.getUserName());
         if (user.isPresent())
             return null;
         String password = passwordEncoder.encode(authUserDto.getPassword());
@@ -33,12 +41,18 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .password(password)
                 .build();
 
-        return authRepository.save(authUser);
+
+
+
+        return authUserRepository.save(authUser);
     }
+
+
+
 
     @Override
     public TokenDto login(AuthUserDto authUserDto) {
-        Optional<AuthUser> user = authRepository.findByUserName(authUserDto.getUserName());
+        Optional<AuthUser> user = authUserRepository.findByUsername(authUserDto.getUserName());
         if (!user.isPresent())
             return null;
         if (passwordEncoder.matches(authUserDto.getPassword(), user.get().getPassword()))
@@ -46,13 +60,17 @@ public class AuthUserServiceImpl implements AuthUserService {
         return null;
     }
 
+
+
+
     @Override
     public TokenDto validate(String token) {
         if (!jwtProvider.validate(token))
             return null;
         String username = jwtProvider.getUserNameFromToken(token);
-        if (!authRepository.findByUserName(username).isPresent())
+        if (!authUserRepository.findByUsername(username).isPresent())
             return null;
         return new TokenDto(token);
     }
 }
+

@@ -1,9 +1,14 @@
+
 package com.example.msauth.security;
 import com.example.msauth.entity.AuthUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+
+
+
 import javax.annotation.PostConstruct;
 import java.util.Base64;
 import java.util.Date;
@@ -41,7 +46,6 @@ public class JwtProvider    {
     public boolean validate(String token) {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-
 
             return true;
         }catch (Exception e){
